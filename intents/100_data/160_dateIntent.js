@@ -1,11 +1,10 @@
 import {SessionHandler} from "../../handler/sessionHandler.js";
+import {DataHandler} from "../../database/dbHandler.js";
 import {fallback} from "../999_fallbackIntent.js";
-import mysql from "mysql";
 
-export function date(agent) {
-
-
+export async function date(agent) {
     let sessionHandler = new SessionHandler(agent);
+    let dbHandler = new DataHandler();
     let state = sessionHandler.getSessionParameter("state", null);
 
     if (!(state === "NAME")) {
@@ -18,81 +17,50 @@ export function date(agent) {
         sessionHandler.addSessionParameters({
             state: "GEBURTSTAG", birthday: birthday.toString()
         });
-        var name = sessionHandler.getSessionParameter("nameKunde")
-        console.log("Name: " + name);
+        var name = sessionHandler.getSessionParameter("nameKunde");
         console.log("Geburtstag: " + birthday.toString());
         var select = `SELECT *
                       FROM kunde
                       WHERE Name = '${name}'
                         AND Geburtstag = '${birthday}';`;
 
-        // TODO
-        let output;
+        dbHandler.connect();
+        var result = await dbHandler.query(select, (name, birthday))
+        //console.log(result);
+        //console.log(result.length);
 
-        const setOutput = (rows) => {
-            output = rows;
-            console.log(output);
-        }
-
-
-        var con = mysql.createConnection({
-            host: "localhost", user: "root", database: "dhbw", password: "password"
-        });
-        // DATABASE ABFRAGEN
-        con.connect(function (err) {
-            if (err) throw err;
-            con.query(select.toString(), function (err, rows, fields) {
-                if (err) throw err;
-                setOutput(rows);
-                sessionHandler.addSessionParameters({
-                    result: rows
-                });
-            });
-        });
-        var result = con.query(select.toString(),);
-        console.log(result);
         let sessionParameterBdayIntent = sessionHandler.getSessionParameter("bdayIntent");
-        console.log("HILFE");
-        console.log(sessionHandler.getSessionParameter("result"));
-        if (!output) {
-            console.log("HILFE");
-
+        if (result.length > 0) {
             agent.add(`Bitte nenne mir nun deinen Service Pin`);
+            await dbHandler.close()
         } else {
             if (sessionParameterBdayIntent === "3") {
                 agent.end("Ich habe dich leider zu oft nicht verstanden. Du wirst mit dem Kundenservice verbunden.!");
+                await dbHandler.close()
             } else {
                 if (sessionParameterBdayIntent === "0") {
                     sessionHandler.addSessionParameters({
                         bdayIntent: "1", state: "START"
                     });
                     agent.add(`Es ist kein Kunde mit den genannten Informationen registriert. Bitte wiederholen Sie ihren Namen.`);
+                    await dbHandler.close()
                 }
                 if (sessionParameterBdayIntent === "1") {
                     sessionHandler.addSessionParameters({
                         bdayIntent: "2", state: "START"
-
                     });
                     agent.add(`Es ist kein Kunde mit den genannten Informationen registriert. Bitte wiederholen Sie ihren Namen.`);
+                    await dbHandler.close()
                 }
                 if (sessionParameterBdayIntent === "2") {
                     sessionHandler.addSessionParameters({
                         bdayIntent: "3", state: "START"
                     });
                     agent.add(`Es ist kein Kunde mit den genannten Informationen registriert. Bitte wiederholen Sie ihren Namen.`);
+                    await dbHandler.close()
                 }
             }
-
         }
-
-
     }
 }
 
-function sleep(milliseconds) {
-    const date = Date.now();
-    let currentDate = null;
-    do {
-        currentDate = Date.now();
-    } while (currentDate - date < milliseconds);
-}
