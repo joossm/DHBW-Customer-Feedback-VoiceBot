@@ -1,5 +1,5 @@
 import {SessionHandler} from "../../handler/sessionHandler.js";
-import {DataHandler} from "../../database/dbHandler.js";
+import {DataHandler} from "../../database/databaseHandler.js";
 import {fallback} from "../999_fallbackIntent.js";
 
 export async function date(agent) {

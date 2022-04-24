@@ -11,7 +11,6 @@ const con = mysql.createConnection({
 
 export class DataHandler {
 
-
     connect() {
         con.connect(err => {
             if (err) {
