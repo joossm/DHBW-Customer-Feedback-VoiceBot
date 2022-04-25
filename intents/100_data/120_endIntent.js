@@ -17,6 +17,6 @@ export function end(agent) {
     }
 
     if (state === "AUFTRAGSNUMMER") {
-        agent.end("Vielen Dank für Ihren Anruf. Wir wünschen Ihnen einen schönen Tag und bleiben Sie gesund.");
+        agent.add("Vielen Dank für Ihren Anruf. Wir wünschen Ihnen einen schönen Tag und bleiben Sie gesund.")
     }
 }

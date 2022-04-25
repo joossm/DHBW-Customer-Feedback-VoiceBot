@@ -22,6 +22,7 @@ export async function number(agent) {
         console.log("ServicepinValidate: " + servicePinValidate);
         let servicePinValidateTrys = sessionHandler.getSessionParameter("servicePinIntent", null);
         console.log("ServicepinValidateTrys: " + servicePinValidateTrys);
+        agent.add(`Einen Moment bitte. Ich schaue nach offenen Aufträgen.`);
 
 
         if (servicePin.toString() === servicePinValidate.toString()) {
@@ -40,13 +41,14 @@ export async function number(agent) {
                                    FROM auftrag
                                    WHERE idKunde = '${idKunde}'
                                      AND rated = '1';`;
-                var result = await databaseHandler.query(selectQuery, idKunde)
-                if (result === 0) {
+                var result2 = await databaseHandler.query(selectQuery, idKunde)
+                if (result2 === 0) {
                     agent.add(`Es liegt kein Auftrag für Feedback vor.`);
+                    console.log("Es liegt kein Auftrag für Feedback vor.");
                 } else {
                     agent.add(`Zu allen Aufträgen wurde bereits Feedback abgegeben`);
                 }
-                agent.end(`Vielen Dank für Ihren Anruf.`);
+                agent.add(`Vielen Dank für Ihren Anruf.`);
                 // ENDE TELEFONAT
 
             }
@@ -73,7 +75,7 @@ export async function number(agent) {
 
         } else {
             if (servicePinValidateTrys === "3") {
-                agent.end("Die Service Pin war zu oft falsch. Du wirst mit dem Kundenservice verbunden!");
+                agent.add("Die Service Pin war zu oft falsch. Du wirst mit dem Kundenservice verbunden!");
             } else {
                 if (servicePinValidateTrys === "0") {
                     sessionHandler.addSessionParameters({
@@ -96,6 +98,7 @@ export async function number(agent) {
             }
         }
     }
+
     if (state === "AUFTRAGSNUMMER") {
         let auftragsnummer = agent.parameters.number;
         console.log("Auftragsnummer: " + auftragsnummer);
@@ -117,6 +120,7 @@ export async function number(agent) {
             agent.add("Entschuldigung es ist ein Fehler passiert. Bitte wiederholen Sie die Auftragsnummer.")
         }
     }
+
     if (state === "AUFTRAGSEVALUIERUNG") {
         let bewertung = agent.parameters.number;
         console.log("Lieferzeit: " + bewertung);
@@ -126,6 +130,7 @@ export async function number(agent) {
         });
         agent.add("Wie zufrieden Sie sind Sie mit der Qualität? Bitte bewerten Sie wie folgt, sagen Sie Qualität 1 für sehr gut, Qualität 2 für gut, Qualität 3 für zufrieden, Qualität 4 für mangelhaft.")
     }
+
     if (state === "LIEFERZEIT") {
         let bewertung = agent.parameters.number;
         console.log("Qualität: " + bewertung);
@@ -135,6 +140,7 @@ export async function number(agent) {
         });
         agent.add("Würden Sie wieder bei uns bestellen und uns weiter empfehlen? Bitte bewerten Sie wie folgt, sagen Sie 1 für Ja oder 2 für Nein.")
     }
+
     if (state === "QUALITAET") {
         let bewertung = agent.parameters.number;
         console.log("Weiter Empfehlen: " + bewertung);
@@ -168,7 +174,7 @@ export async function number(agent) {
         console.log(result);
         if (result.length === 0) {
             agent.add("Vielen Dank für Ihr Feedback zu dem Auftrag mit der Nummer " + sessionHandler.getSessionParameter("idAuftrag") + ".")
-            agent.end(`Es wurde zu allen Aufträgen Feedback gegeben. Vielen Dank und Auf Wiedersehen.`);
+            agent.add(`Es wurde zu allen Aufträgen Feedback gegeben. Vielen Dank und Auf Wiedersehen.`);
             // ENDE TELEFONAT
         }
         if (result.length === 1) {
@@ -194,6 +200,5 @@ export async function number(agent) {
         }
 
     }
-
 
 }

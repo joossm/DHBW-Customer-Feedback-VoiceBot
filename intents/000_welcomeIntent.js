@@ -9,8 +9,7 @@ import {SessionHandler} from "../handler/sessionHandler.js";
  */
 
 export function welcome(agent) { //Export = Public
-    agent.add("Hallo hier ist der Kundenservice!\n" +
-        "Bitte nennen Sie uns Ihren Namen?");
+    agent.add("Hallo hier ist der Kundenservice! Bitte nennen Sie uns Ihren Namen?");
     let sessionHandler = new SessionHandler(agent)
     sessionHandler.addSessionParameters({
         state: "START",

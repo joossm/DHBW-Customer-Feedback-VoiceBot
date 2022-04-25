@@ -17,10 +17,6 @@ export function fullName(agent) {
 
     // INTENT: fullName
     if (state === "START") {
-        // Erfassung Name des Nachmieters
-        /*let firstname = agent.parameters.firstname;
-        let lastname = agent.parameters.lastname;
-        let fullname = firstname + " " + lastname;*/
         let fullname = agent.parameters.person;
         sessionHandler.addSessionParameters({
             state: "NAME",
@@ -28,7 +24,7 @@ export function fullName(agent) {
         })
         console.log("Name: " + fullname.name.toString());
 
-        agent.add("Bitte teilen Sie uns Ihr Geburtsdatum mit. Bitte antworten Sie in ganzen Sätzen.")
+        agent.add("Bitte teilen Sie uns Ihr Geburtsdatum mit.")
     }
 
 
