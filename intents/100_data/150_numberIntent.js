@@ -1,11 +1,9 @@
 import {SessionHandler} from "../../handler/sessionHandler.js";
 import {fallback} from "../999_fallbackIntent.js";
-import {DatabaseHandler} from "../../database/databaseHandler.js";
-
-const databaseHandler = new DatabaseHandler();
+import {databaseHandler} from "../../database/databaseHandler.js";
 
 
-export function number(agent) {
+export async function number(agent) {
     let sessionHandler = new SessionHandler(agent);
     let state = sessionHandler.getSessionParameter("state", null);
 
@@ -18,12 +16,38 @@ export function number(agent) {
     if (state === "GEBURTSTAG") {
         // Erfassung der Servicepin
         let servicePin = agent.parameters.number;
+        console.log("Servicepin: " + servicePin);
         let servicePinValidate = sessionHandler.getSessionParameter("servicePin", null);
+        console.log("ServicepinValidate: " + servicePinValidate);
         let servicePinValidateTrys = sessionHandler.getSessionParameter("servicePinIntent", null);
+        console.log("ServicepinValidateTrys: " + servicePinValidateTrys);
 
 
         if (servicePin.toString() === servicePinValidate.toString()) {
-            agent.add(`Bitte nenne mir nun deinen Service Pin`);
+            agent.add(`Einen Moment bitte. Ich schaue nach offenen Aufträgen.`);
+
+            let idKunde = sessionHandler.getSessionParameter("idKunde", null);
+            console.log("idKunde: " + idKunde);
+            var selectQuery = `SELECT *
+                               FROM auftrag
+                               WHERE idKunde = '${idKunde}'
+                                 AND rated = '0';`;
+            var result = await databaseHandler.query(selectQuery, idKunde)
+            if (result.length === 0) {
+                agent.add(`Es liegt kein Auftrag für Feedback vor.`);
+
+            }
+            if (result.length === 1) {
+
+
+            }
+
+            if (result.length > 1) {
+                agent.add(`Es liegen ${result.length} Aufträge für Feedback vor.`);
+
+            }
+
+
             sessionHandler.addSessionParameters({
                 state: "SERVICEPIN",
             });
@@ -52,13 +76,6 @@ export function number(agent) {
                 }
             }
         }
-
-
-        sessionHandler.addSessionParameters({
-            state: "MOC_CN",
-        });
-        agent.add("Bitte teilen Sie uns ihre Telefonnummer oder E-Mail mit.");
-        console.log("Kundennummer: " + servicePin.toString());
     }
 
 }

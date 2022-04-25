@@ -2,6 +2,7 @@
 
 import mysql from "mysql";
 
+
 const con = mysql.createConnection({
     host: "localhost",
     user: "root",
@@ -40,3 +41,5 @@ export class DatabaseHandler {
     }
 
 }
+
+export const databaseHandler = new DatabaseHandler();
