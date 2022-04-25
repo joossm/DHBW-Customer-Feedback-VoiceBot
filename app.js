@@ -5,8 +5,9 @@ import {welcome} from "./intents/000_welcomeIntent.js";
 import {fallback} from "./intents/999_fallbackIntent.js";
 import {WebhookClient} from "dialogflow-fulfillment";
 import {fullName} from "./intents/100_data/110_fullNameIntent.js";
-import {number} from "./intents/100_data/150_numberIntent.js";
-import {date} from "./intents/100_data/160_dateIntent.js";
+import {end} from "./intents/100_data/120_endIntent.js";
+import {number} from "./intents/100_data/130_numberIntent.js";
+import {date} from "./intents/100_data/140_dateIntent.js";
 
 
 const app = express();
@@ -22,23 +23,16 @@ app.post("/webhook", express.json(), (req, res) => {
     });
 
     // --------------------------------------------------------------------------
-    // SETUP DATABABASE
-    // --------------------------------------------------------------------------
-
-
-    // --------------------------------------------------------------------------
     // MAPPING INTENTS
     // --------------------------------------------------------------------------
     let intentMap = new Map();
+
     intentMap.set('000_welcomeIntent', welcome);
     intentMap.set('110_fullNameIntent', fullName);
-    //intentMap.set('320_addressIntent', address);
-    //intentMap.set('330_phoneNumberIntent', phoneNumber);
-    //intentMap.set('340_eMailIntent', eMail);
-    intentMap.set('150_numberIntent', number);
-    intentMap.set('160_dateIntent', date);
+    intentMap.set('120_endIntent', end);
+    intentMap.set('130_numberIntent', number);
+    intentMap.set('140_dateIntent', date);
     intentMap.set('999_fallbackIntent', fallback);
-
 
     return agent.handleRequest(intentMap);
 })
