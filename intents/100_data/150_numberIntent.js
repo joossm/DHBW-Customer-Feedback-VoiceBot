@@ -1,114 +1,64 @@
-/*
-Zählernummer
-Zählerstand
-Marktlokation oder Zählernummer
-Zählerstände*/
-
 import {SessionHandler} from "../../handler/sessionHandler.js";
 import {fallback} from "../999_fallbackIntent.js";
+import {DatabaseHandler} from "../../database/databaseHandler.js";
+
+const databaseHandler = new DatabaseHandler();
+
 
 export function number(agent) {
     let sessionHandler = new SessionHandler(agent);
     let state = sessionHandler.getSessionParameter("state", null);
 
-    if (!((state === "MOC_NAME")
-        || (state === "MOC_NT")
-        || (state === "MOC_MN")
-        || (state === "SCC_NAME")
-        || (state === "SCC_PE")
-        || (state === "SCC_MN")
-        || (state === "MO_SC_PE")
-        || (state === "MO_SC_MN"))) {
+    if (!(state === "GEBURTSTAG")) {
         return fallback(agent);
     }
 
 
-    // INTENTS Auszugsbestätigung
-    if (state === "MOC_NAME") {
-        // Erfassung der Kundennummer
-        let customerNumber = agent.parameters.number;
+    // INTENT Servicepin
+    if (state === "GEBURTSTAG") {
+        // Erfassung der Servicepin
+        let servicePin = agent.parameters.number;
+        let servicePinValidate = sessionHandler.getSessionParameter("servicePin", null);
+        let servicePinValidateTrys = sessionHandler.getSessionParameter("servicePinIntent", null);
+
+
+        if (servicePin.toString() === servicePinValidate.toString()) {
+            agent.add(`Bitte nenne mir nun deinen Service Pin`);
+            sessionHandler.addSessionParameters({
+                state: "SERVICEPIN",
+            });
+
+        } else {
+            if (servicePinValidateTrys === "3") {
+                agent.end("Die Service Pin war zu oft falsch. Du wirst mit dem Kundenservice verbunden!");
+            } else {
+                if (servicePinValidateTrys === "0") {
+                    sessionHandler.addSessionParameters({
+                        servicePinIntent: "1", state: "GEBURTSTAG"
+                    });
+                    agent.add(`Die Service Pin ist falsch bitte versuchen Sie es erneut.`);
+                }
+                if (servicePinValidateTrys === "1") {
+                    sessionHandler.addSessionParameters({
+                        servicePinIntent: "2", state: "GEBURTSTAG"
+                    });
+                    agent.add(`Die Service Pin ist falsch bitte versuchen Sie es erneut.`);
+                }
+                if (servicePinValidateTrys === "2") {
+                    sessionHandler.addSessionParameters({
+                        servicePinIntent: "3", state: "GEBURTSTAG"
+                    });
+                    agent.add(`Die Service Pin ist falsch bitte versuchen Sie es erneut.`);
+                }
+            }
+        }
+
+
         sessionHandler.addSessionParameters({
             state: "MOC_CN",
-            customerNumber: customerNumber.toString()
         });
         agent.add("Bitte teilen Sie uns ihre Telefonnummer oder E-Mail mit.");
-        console.log("Kundennummer: " + customerNumber.toString());
-    }
-    if (state === "MOC_NT") {
-        // Erfassung der Marktlokation oder der Zählernummer
-        let meterNumber = agent.parameters.number;
-        sessionHandler.addSessionParameters({
-            state: "MOC_MN",
-            meterNumber: meterNumber.toString()
-        });
-        agent.add("Bitte teilen Sie uns ihren Zählerstand mit. Bitte in einem Vollständigen Satz.");
-        console.log("Zählernummer: " + meterNumber.toString());
-    }
-    if (state === "MOC_MN") {
-        // Erfassung des Zählerstands
-        let meterReading = agent.parameters.number;
-        sessionHandler.addSessionParameters({
-            state: "MOC_MR",
-            meterReading: meterReading.toString()
-        });
-        agent.add("Bitte teilen Sie uns das Ablesedatum mit. Bitte antworten Sie in einem vollständigen Satz.");
-        console.log("Zählerstand: " + meterReading.toString());
-    }
-
-
-    // INTENTS Lieferantenwechselbestätigung
-    if (state === "SCC_NAME") {
-        // Erfassung der Kundennummer
-        let customerNumber = agent.parameters.number;
-        sessionHandler.addSessionParameters({
-            state: "SCC_CN",
-            customerNumber: customerNumber.toString()
-        });
-        agent.add("Bitte teilen Sie uns ihre Telefonnummer oder E-Mail mit.");
-        console.log("Kundennummer: " + customerNumber.toString());
-    }
-    if (state === "SCC_PE") {
-        // Erfassung der Marktlokation oder der Zählernummer
-        let meterNumber = agent.parameters.number;
-        sessionHandler.addSessionParameters({
-            state: "SCC_MN",
-            meterNumber: meterNumber.toString()
-        });
-        agent.add("Bitte teilen Sie uns ihren Zählerstand mit. Bitte in einem Vollständigen Satz.");
-        console.log("Zählernummer: " + meterNumber.toString());
-    }
-    if (state === "SCC_MN") {
-        // Erfassung des Zählerstands
-        let meterReading = agent.parameters.number;
-        sessionHandler.addSessionParameters({
-            state: "SCC_MR",
-            meterReading: meterReading.toString()
-        });
-        agent.add("Bitte teilen Sie uns das Ablesedatum mit. Bitte antworten Sie in einem vollständigen Satz.");
-        console.log("Zählerstand: " + meterReading.toString());
-    }
-
-
-    // INTENTS Auszug & Lieferantenwechsel
-    if (state === "MO_SC_PE") {
-        // Erfassung der Marktlokation oder der Zählernummer
-        let meterNumber = agent.parameters.number;
-        sessionHandler.addSessionParameters({
-            state: "MO_SC_MN",
-            meterNumber: meterNumber.toString()
-        });
-        agent.add("Bitte teilen Sie uns ihren Zählerstand mit. Bitte in einem Vollständigen Satz.");
-        console.log("Zählernummer: " + meterNumber.toString());
-    }
-    if (state === "MO_SC_MN") {
-        // Erfassung des Zählerstands
-        let meterReading = agent.parameters.number;
-        sessionHandler.addSessionParameters({
-            state: "MO_SC_MR",
-            meterReading: meterReading.toString()
-        });
-        agent.add("Bitte teilen Sie uns die Adresse des Gebäudes in dem der Zähler eingebaut ist mit. Bitte antworten Sie in einem vollständigen Satz.");
-        console.log("Zählerstand: " + meterReading.toString());
+        console.log("Kundennummer: " + servicePin.toString());
     }
 
 }

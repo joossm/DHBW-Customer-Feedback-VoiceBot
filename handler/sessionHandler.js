@@ -1,6 +1,7 @@
 "use strict";
 import {WebhookClient} from "dialogflow-fulfillment";
 import {fallback} from "../intents/999_fallbackIntent.js";
+
 export class SessionHandler {
     /**
      * constructor for SessionHandler
@@ -39,7 +40,7 @@ export class SessionHandler {
         if (sessionState != null) {
             let sessionValue = sessionState.parameters[parameter];
             // Check if sessionValue is not null or undefined
-            if(sessionValue != null) {
+            if (sessionValue != null) {
                 return sessionValue;
             } else {
                 return defaultValue;

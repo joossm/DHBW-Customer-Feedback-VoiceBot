@@ -9,7 +9,10 @@ const con = mysql.createConnection({
     database: "dhbw"
 });
 
-export class DataHandler {
+export class DatabaseHandler {
+    constructor() {
+        this.connect();
+    }
 
     connect() {
         con.connect(err => {
@@ -35,4 +38,5 @@ export class DataHandler {
         con.end();
         console.log('Connection to database ended');
     }
+
 }

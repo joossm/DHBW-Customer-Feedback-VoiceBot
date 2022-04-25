@@ -16,5 +16,6 @@ export function welcome(agent) { //Export = Public
         state: "START",
         intent: "0",
         bdayIntent: "0",
+        servicePinIntent: "0",
     })
 }

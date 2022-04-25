@@ -7,7 +7,6 @@ import {WebhookClient} from "dialogflow-fulfillment";
 import {fullName} from "./intents/100_data/110_fullNameIntent.js";
 import {number} from "./intents/100_data/150_numberIntent.js";
 import {date} from "./intents/100_data/160_dateIntent.js";
-import {SessionHandler} from "./handler/sessionHandler.js";
 
 
 const app = express();
