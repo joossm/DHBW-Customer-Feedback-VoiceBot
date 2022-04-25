@@ -7,7 +7,8 @@ const con = mysql.createConnection({
     host: "localhost",
     user: "root",
     password: "password",
-    database: "dhbw"
+    database: "dhbw",
+    serverTimezone:"UTC",
 });
 
 export class DatabaseHandler {

@@ -20,8 +20,8 @@ export async function date(agent) {
 
         var selectQuery = `SELECT *
                            FROM kunde
-                           WHERE Name = '${name}'
-                             AND Geburtstag = '${birthday}';`;
+                           WHERE name = '${name}'
+                             AND geburtstag = '${birthday}';`;
         var result = await databaseHandler.query(selectQuery, (name, birthday))
 
 
@@ -30,7 +30,7 @@ export async function date(agent) {
             sessionHandler.addSessionParameters({
                 state: "GEBURTSTAG",
                 birthday: birthday.toString(),
-                servicePin: result[0].Servicepin.toString(),
+                servicePin: result[0].servicepin.toString(),
                 idKunde: result[0].idKunde.toString()
             });
         } else {

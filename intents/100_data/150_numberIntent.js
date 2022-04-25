@@ -7,7 +7,7 @@ export async function number(agent) {
     let sessionHandler = new SessionHandler(agent);
     let state = sessionHandler.getSessionParameter("state", null);
 
-    if (!(state === "GEBURTSTAG")) {
+    if (!((state === "GEBURTSTAG") || (state === "AUFTRAGSNUMMER"))) {
         return fallback(agent);
     }
 
@@ -33,24 +33,42 @@ export async function number(agent) {
                                WHERE idKunde = '${idKunde}'
                                  AND rated = '0';`;
             var result = await databaseHandler.query(selectQuery, idKunde)
+            console.log(result);
             if (result.length === 0) {
-                agent.add(`Es liegt kein Auftrag für Feedback vor.`);
+                var selectQuery = `SELECT *
+                                   FROM auftrag
+                                   WHERE idKunde = '${idKunde}'
+                                     AND rated = '1';`;
+                var result = await databaseHandler.query(selectQuery, idKunde)
+                if (result === 0) {
+                    agent.add(`Es liegt kein Auftrag für Feedback vor.`);
+                } else {
+                    agent.add(`Zu allen Aufträgen wurde bereits Feedback abgegeben`);
+                }
+                agent.end(`Vielen Dank für Ihren Anruf.`);
+                // ENDE TELEFONAT
 
             }
             if (result.length === 1) {
-
-
+                agent.add(`Es liegt ${result.length} Auftrag für Feedback vor.`);
+                agent.add(`Ich habe folgenden Auftrag für Feedback gefunden:`);
+                agent.add(`Auftrag ${result[0].idAuftrag} vom ${result[0].datum}`);
+                agent.add(`Wollen Sie diesen bewerten, dann wiederholen Sie bitte die Auftragsnummer.`);
+                sessionHandler.addSessionParameters({
+                    state: "AUFTRAGSNUMMER",
+                });
             }
 
             if (result.length > 1) {
                 agent.add(`Es liegen ${result.length} Aufträge für Feedback vor.`);
-
+                for (var i = 0; i < result.length; i++) {
+                    agent.add(`Auftrag ${result[i].idAuftrag} vom ${result[i].datum}`);
+                }
+                agent.add(`Sagen Sie bitte die Auftragsnummer des Auftrags, den Sie bewerten möchten.`);
+                sessionHandler.addSessionParameters({
+                    state: "AUFTRAGSNUMMER",
+                });
             }
-
-
-            sessionHandler.addSessionParameters({
-                state: "SERVICEPIN",
-            });
 
         } else {
             if (servicePinValidateTrys === "3") {
@@ -77,5 +95,42 @@ export async function number(agent) {
             }
         }
     }
+    if (state === "AUFTRAGSNUMMER") {
+        let auftragsnummer = agent.parameters.number;
+        console.log("Auftragsnummer: " + auftragsnummer);
+        sessionHandler.addSessionParameters({
+            state: "AUFTRAGSEVALUIERUNG",
+            idAuftrag: auftragsnummer.toString(),
+        });
+        agent.add("Wie zufrieden sind Sie mit der Lieferzeit? Bitte bewerten Sie wie folgt, sagen Sie 1 für sehr gut, 2 für In Ordnung und 3 für zu lange.")
+    }
+    if (state === "AUFTRAGSEVALUIERUNG") {
+        let bewertung = agent.parameters.number;
+        console.log("Lieferzeit: " + bewertung);
+        sessionHandler.addSessionParameters({
+            state: "LIEFERZEIT",
+            lieferzeit: bewertung.toString(),
+        });
+        agent.add("Wie zufrieden Sie sind Sie mit der Qualität? Bitte bewerten Sie wie folgt, sagen Sie 1 für sehr gut, 2 für gut, 3 für zufrieden, 4 für mangelhaft.")
+    }
+    if (state === "LIEFERZEIT") {
+        let bewertung = agent.parameters.number;
+        console.log("Qualität: " + bewertung);
+        sessionHandler.addSessionParameters({
+            state: "QUALITAET",
+            qualitaet: bewertung.toString(),
+        });
+        agent.add("Würden Sie wieder bei uns bestellen und uns weiter empfehlen? Bitte bewerten Sie wie folgt, sagen Sie 1 für Ja oder 2 für Nein.")
+    }
+    if (state === "QUALITAET") {
+        let bewertung = agent.parameters.number;
+        console.log("Weiter Empfehlen: " + bewertung);
+        sessionHandler.addSessionParameters({
+            state: "EMPFEHLEN",
+            empfehlen: bewertung.toString(),
+        });
+        agent.add("Würden Sie bei uns wieder bei uns bestellen und uns weiter empfehlen? Bitte bewerten Sie wie folgt, sagen Sie 1 für Ja oder 2 für Nein.")
+    }
+
 
 }
