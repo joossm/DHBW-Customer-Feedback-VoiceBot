@@ -101,10 +101,10 @@ export async function number(agent) {
         console.log("Auftragsnummer: " + auftragsnummer);
         let idKunde = sessionHandler.getSessionParameter("idKunde", null);
         var selectProofQuery = `SELECT *
-                           FROM auftrag
-                           WHERE idKunde = '${idKunde}'
-                             AND rated = '0'
-                             AND idAuftrag = '${auftragsnummer}';`;
+                                FROM auftrag
+                                WHERE idKunde = '${idKunde}'
+                                  AND rated = '0'
+                                  AND idAuftrag = '${auftragsnummer}';`;
         var resultAN = await databaseHandler.query(selectProofQuery, (idKunde, auftragsnummer));
         console.log(resultAN);
         if (resultAN.length === 1) {
