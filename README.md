@@ -1,4 +1,4 @@
-# dhbw-customerFeedback
+# DHBW-Customer-Feedback-VoiceBot
 
 VoiceBot
 
