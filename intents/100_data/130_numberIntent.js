@@ -26,7 +26,6 @@ export async function number(agent) {
 
 
         if (servicePin.toString() === servicePinValidate.toString()) {
-            agent.add(`Einen Moment bitte. Ich schaue nach offenen Aufträgen.`);
 
             let idKunde = sessionHandler.getSessionParameter("idKunde", null);
             console.log("idKunde: " + idKunde);
